@@ -9,7 +9,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "SUA_CHAVE",
+    authDomain: "SEU_DOMINIO",
+    projectId: "SEU_PROJECT_ID",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+  <body>
   <section class="login-screen" id="login">
     <div class="login-panel">
       <div class="brand-chip">CRM Empresarial</div>
