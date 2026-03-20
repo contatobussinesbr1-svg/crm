@@ -1,3 +1,20 @@
+import { collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+async function salvarDados(colecao, dados) {
+  await addDoc(collection(window.db, colecao), dados);
+}
+
+async function listarDados(colecao) {
+  const querySnapshot = await getDocs(collection(window.db, colecao));
+  let lista = [];
+  querySnapshot.forEach((doc) => {
+    lista.push({ id: doc.id, ...doc.data() });
+  });
+  return lista;
+}
+
+async function excluirDado(colecao, id) {
+  await deleteDoc(doc(window.db, colecao, id));
+}
 const STORAGE_KEYS = {
   usuarios: "crm_usuarios",
   candidatos: "crm_candidatos",
