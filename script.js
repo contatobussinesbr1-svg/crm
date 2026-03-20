@@ -1,10 +1,13 @@
 import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ===== FIREBASE =====
-async function salvarUsuario(user, pass) {
-  await addDoc(collection(window.db, "usuarios"), { user, pass });
+// ===== ESPERA FIREBASE CARREGAR =====
+async function esperarDB() {
+  while (!window.db) {
+    await new Promise(r => setTimeout(r, 100));
+  }
 }
 
+// ===== USUÁRIOS =====
 async function listarUsuarios() {
   const snapshot = await getDocs(collection(window.db, "usuarios"));
   let lista = [];
@@ -14,6 +17,10 @@ async function listarUsuarios() {
   return lista;
 }
 
+async function salvarUsuario(user, pass) {
+  await addDoc(collection(window.db, "usuarios"), { user, pass });
+}
+
 // ===== ELEMENTOS =====
 const loginForm = document.getElementById("login-form");
 const loginSection = document.getElementById("login");
@@ -21,21 +28,20 @@ const appSection = document.getElementById("app");
 const userForm = document.getElementById("user-form");
 const listaUsers = document.getElementById("listaUsers");
 
-// ===== ESTADO =====
-let usuarios = [];
-
 // ===== LOGIN =====
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const user = document.getElementById("user").value;
-  const pass = document.getElementById("pass").value;
+  await esperarDB();
 
-  usuarios = await listarUsuarios();
+  const user = document.getElementById("user").value.trim();
+  const pass = document.getElementById("pass").value.trim();
 
-  const encontrado = usuarios.find(u => u.user === user && u.pass === pass);
+  const usuarios = await listarUsuarios();
 
-  if (!encontrado) {
+  const existe = usuarios.find(u => u.user === user && u.pass === pass);
+
+  if (!existe) {
     alert("Login inválido");
     return;
   }
@@ -48,21 +54,25 @@ loginForm.addEventListener("submit", async (e) => {
 userForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const user = document.getElementById("novoUser").value;
-  const pass = document.getElementById("novaPassUser").value;
+  await esperarDB();
+
+  const user = document.getElementById("novoUser").value.trim();
+  const pass = document.getElementById("novaPassUser").value.trim();
 
   if (!user || !pass) return;
 
   await salvarUsuario(user, pass);
 
-  alert("Usuário criado com sucesso");
+  alert("Usuário criado!");
   userForm.reset();
   carregarUsuarios();
 });
 
 // ===== LISTAR USUÁRIOS =====
 async function carregarUsuarios() {
-  usuarios = await listarUsuarios();
+  await esperarDB();
+
+  const usuarios = await listarUsuarios();
 
   listaUsers.innerHTML = "";
 
@@ -73,18 +83,21 @@ async function carregarUsuarios() {
   });
 }
 
-// ===== PRIMEIRO ACESSO (CRIA ADMIN AUTOMÁTICO) =====
-async function criarAdminPadrao() {
-  const lista = await listarUsuarios();
+// ===== CRIAR ADMIN AUTOMÁTICO =====
+async function criarAdmin() {
+  await esperarDB();
 
-  if (lista.length === 0) {
+  const usuarios = await listarUsuarios();
+
+  if (usuarios.length === 0) {
     await salvarUsuario("admin", "123");
+    console.log("Admin criado: admin / 123");
   }
 }
 
 // ===== INIT =====
 async function init() {
-  await criarAdminPadrao();
+  await criarAdmin();
   await carregarUsuarios();
 }
 
