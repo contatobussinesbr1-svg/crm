@@ -1,228 +1,255 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Empresarial</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<title>CRM Empresarial</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body { margin:0; font-family:Manrope; background:#f7f8fc; }
+
+.sidebar{
+width:220px;
+height:100vh;
+background:#c7d2fe;
+position:fixed;
+padding:20px;
+}
+
+.sidebar button{
+display:block;
+margin:10px 0;
+background:none;
+border:none;
+cursor:pointer;
+font-weight:600;
+}
+
+.content{
+margin-left:240px;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+button{
+background:#a5b4fc;
+border:none;
+padding:10px;
+border-radius:10px;
+cursor:pointer;
+color:white;
+}
+
+button:hover{
+background:#818cf8;
+}
+
+li{
+background:#eef2ff;
+margin:10px 0;
+padding:10px;
+border-radius:10px;
+}
+</style>
 </head>
+
 <body>
-  <section class="login-screen" id="login">
-    <div class="login-panel">
-      <div class="brand-chip">CRM Empresarial</div>
-      <h1>Painel interno da empresa</h1>
-      <p>Entre com um usuario cadastrado para acessar o CRM.</p>
 
-      <form id="login-form" class="stack-form">
-        <label for="user">Usuario</label>
-        <input id="user" name="user" type="text" placeholder="Digite seu usuario" required>
+<div class="sidebar">
+<h3>CRM</h3>
+<button onclick="mostrar('dashboard')">Dashboard</button>
+<button onclick="mostrar('recrutamento')">Recrutamento</button>
+<button onclick="mostrar('treinamento')">Treinamento</button>
+<button onclick="mostrar('funcionarios')">Funcionários</button>
+<button onclick="mostrar('departamentos')">Departamentos</button>
+</div>
 
-        <label for="pass">Senha</label>
-        <input id="pass" name="pass" type="password" placeholder="Digite sua senha" required>
+<div class="content">
 
-        <button type="submit">Entrar</button>
-      </form>
-    </div>
-  </section>
+<div id="dashboard" class="card">
+<h2>Dashboard</h2>
+<p>Total candidatos: <span id="dashCand">0</span></p>
+<p>Total funcionários: <span id="dashFunc">0</span></p>
+</div>
 
-  <div class="app-shell hidden" id="app">
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <p class="sidebar-kicker">Painel interno</p>
-        <h2>CRM</h2>
-      </div>
+<div id="recrutamento" class="card" style="display:none">
+<h2>Recrutamento</h2>
 
-      <nav class="nav">
-        <button class="nav-button active" data-section="dashboard">Dashboard</button>
-        <button class="nav-button" data-section="recrutamento">Recrutamento</button>
-        <button class="nav-button" data-section="treinamento">Treinamento</button>
-        <button class="nav-button" data-section="funcionarios">Funcionarios</button>
-        <button class="nav-button" data-section="departamentos">Departamentos</button>
-        <button class="nav-button" data-section="financeiro">Financeiro</button>
-        <button class="nav-button" data-section="documentos">Documentos</button>
-        <button class="nav-button" data-section="relatorios">Relatorios</button>
-        <button class="nav-button" data-section="config">Configuracoes</button>
-      </nav>
-    </aside>
+<input id="nomeCandidato" placeholder="Nome">
+<input id="cidade" placeholder="Cidade">
 
-    <main class="content">
-      <section id="dashboard" class="card section">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Visao geral</p>
-            <h1>Dashboard</h1>
-          </div>
-        </div>
+<select id="cargo">
+<option value="">Selecione o departamento</option>
+<option>Administração</option>
+<option>Retenção Pro</option>
+<option>FTD</option>
+<option>Financeiro</option>
+<option>Recursos Humanos</option>
+</select>
 
-        <div class="stats-grid dashboard-grid">
-          <article class="stat-card dashboard-card" data-section-target="recrutamento">
-            <span>Total candidatos</span>
-            <strong id="dashboard-candidatos">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="funcionarios">
-            <span>Total funcionarios</span>
-            <strong id="dashboard-funcionarios">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="treinamento">
-            <span>Em treinamento</span>
-            <strong id="dashboard-treinamento">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="documentos">
-            <span>Documentos</span>
-            <strong id="dashboard-documentos">0</strong>
-          </article>
-        </div>
-      </section>
+<button onclick="addCandidato()">Adicionar</button>
 
-      <section id="recrutamento" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Talentos</p>
-            <h1>Recrutamento</h1>
-          </div>
-        </div>
+<ul id="listaCandidatos"></ul>
+</div>
 
-        <form id="candidate-form" class="stack-form">
-          <label for="nomeCandidato">Nome completo</label>
-          <input id="nomeCandidato" name="nomeCandidato" type="text" required>
+<div id="treinamento" class="card" style="display:none">
+<h2>Treinamento</h2>
+<ul id="treinoLista"></ul>
+</div>
 
-          <label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="nascimento" type="date">
+<div id="funcionarios" class="card" style="display:none">
+<h2>Funcionários</h2>
+<ul id="funcLista"></ul>
+</div>
 
-          <label for="cidade">Cidade</label>
-          <input id="cidade" name="cidade" type="text" required>
+<div id="departamentos" class="card" style="display:none">
+<h2>Departamentos</h2>
 
-          <label for="cargo">Departamento</label>
-          <input id="cargo" name="cargo" type="text" placeholder="Ex: Financeiro, RH" required>
+<ul id="deptLista"></ul>
 
-          <button type="submit">Adicionar candidato</button>
-        </form>
+<div id="detalheDept"></div>
+</div>
 
-        <ul id="listaCandidatos" class="data-list"></ul>
-      </section>
+</div>
 
-      <section id="treinamento" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Desenvolvimento</p>
-            <h1>Treinamento</h1>
-          </div>
-        </div>
+<script>
 
-        <ul id="treinamentoLista" class="data-list"></ul>
-      </section>
+// DADOS
+let candidatos = [];
+let treinamento = [];
+let funcionarios = [];
 
-      <section id="funcionarios" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Time ativo</p>
-            <h1>Funcionarios</h1>
-          </div>
-        </div>
+let dept = [
+"Administração",
+"Retenção Pro",
+"FTD",
+"Financeiro",
+"Recursos Humanos"
+];
 
-        <ul id="funcLista" class="data-list"></ul>
-      </section>
+// NAVEGAÇÃO
+function mostrar(sec){
+document.querySelectorAll(".card").forEach(c=>c.style.display="none");
+document.getElementById(sec).style.display="block";
+}
 
-      <section id="departamentos" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Estrutura</p>
-            <h1>Departamentos</h1>
-          </div>
-        </div>
+// CANDIDATOS
+function addCandidato(){
+let c = {
+nome:nomeCandidato.value,
+cidade:cidade.value,
+cargo:cargo.value
+};
 
-        <form id="department-form" class="inline-form single-inline-form">
-          <input id="novoDept" name="novoDept" type="text" placeholder="Novo departamento" required>
-          <button type="submit">Criar</button>
-        </form>
+candidatos.push(c);
+renderCand();
+renderDept();
+atualizar();
+}
 
-        <div class="department-grid">
-          <ul id="deptLista" class="data-list"></ul>
-          <div id="detalheDept" class="detail-card">
-            <h3>Detalhes do departamento</h3>
-            <p>Selecione um departamento para ver as pessoas relacionadas.</p>
-          </div>
-        </div>
-      </section>
+function renderCand(){
+listaCandidatos.innerHTML="";
+candidatos.forEach((c,i)=>{
+listaCandidatos.innerHTML+=`
+<li>${c.nome} - ${c.cargo}
+<button onclick="aprovar(${i})">Aprovar</button>
+</li>`;
+});
+}
 
-      <section id="financeiro" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Folha</p>
-            <h1>Financeiro</h1>
-          </div>
-        </div>
+// TREINAMENTO
+function aprovar(i){
+treinamento.push(candidatos[i]);
+candidatos.splice(i,1);
+renderAll();
+}
 
-        <form id="salary-form" class="inline-form">
-          <input id="nomeSalario" name="nomeSalario" type="text" placeholder="Nome funcionario" required>
-          <input id="salario" name="salario" type="number" min="0" step="0.01" placeholder="Salario" required>
-          <button type="submit">Adicionar</button>
-        </form>
+function renderTreino(){
+treinoLista.innerHTML="";
+treinamento.forEach((t,i)=>{
+treinoLista.innerHTML+=`
+<li>${t.nome}
+<button onclick="contratar(${i})">Contratar</button>
+</li>`;
+});
+}
 
-        <ul id="salariosLista" class="data-list"></ul>
-      </section>
+// FUNCIONÁRIOS
+function contratar(i){
+funcionarios.push(treinamento[i]);
+treinamento.splice(i,1);
+renderAll();
+}
 
-      <section id="documentos" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Arquivos</p>
-            <h1>Documentos</h1>
-          </div>
-        </div>
+function renderFunc(){
+funcLista.innerHTML="";
+funcionarios.forEach(f=>{
+funcLista.innerHTML+=`<li>${f.nome} - ${f.cargo}</li>`;
+});
+}
 
-        <label class="file-upload" for="docInput">
-          <span>Selecionar documento</span>
-          <input id="docInput" type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
-        </label>
+// DEPARTAMENTOS
+function renderDept(){
+deptLista.innerHTML="";
 
-        <ul id="listaDocs" class="data-list"></ul>
-      </section>
+dept.forEach(d=>{
 
-      <section id="relatorios" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Indicadores</p>
-            <h1>Relatorios</h1>
-          </div>
-        </div>
+let total = candidatos.filter(c=>c.cargo===d).length +
+funcionarios.filter(f=>f.cargo===d).length;
 
-        <div class="stats-grid two-cols">
-          <article class="report-card">
-            <span>Total candidatos</span>
-            <strong id="totalCandRelatorio">0</strong>
-          </article>
-          <article class="report-card">
-            <span>Total funcionarios</span>
-            <strong id="totalFuncRelatorio">0</strong>
-          </article>
-        </div>
-      </section>
+deptLista.innerHTML+=`
+<li onclick="verDept('${d}')">
+<b>${d}</b><br>
+${total} pessoa(s)
+</li>`;
+});
+}
 
-      <section id="config" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Acesso</p>
-            <h1>Configuracoes</h1>
-          </div>
-        </div>
+function verDept(nome){
 
-        <div class="subsection no-top">
-          <h3>Criar usuario</h3>
-          <form id="user-form" class="inline-form">
-            <input id="novoUser" name="novoUser" type="text" placeholder="Usuario" required>
-            <input id="novaPassUser" name="novaPassUser" type="password" placeholder="Senha" required>
-            <button type="submit">Criar</button>
-          </form>
-        </div>
+let pessoas = [
+...candidatos.filter(c=>c.cargo===nome),
+...funcionarios.filter(f=>f.cargo===nome)
+];
 
-        <ul id="listaUsers" class="data-list"></ul>
-      </section>
-    </main>
-  </div>
+let html = `<h3>${nome}</h3>`;
 
-  <script src="script.js"></script>
+if(pessoas.length===0){
+html+="<p>Ninguém aqui</p>";
+}else{
+pessoas.forEach(p=>{
+html+=`<p>${p.nome}</p>`;
+});
+}
+
+detalheDept.innerHTML = html;
+}
+
+// DASHBOARD
+function atualizar(){
+dashCand.innerText = candidatos.length;
+dashFunc.innerText = funcionarios.length;
+}
+
+// RENDER GERAL
+function renderAll(){
+renderCand();
+renderTreino();
+renderFunc();
+renderDept();
+atualizar();
+}
+
+renderAll();
+
+</script>
+
 </body>
 </html>
