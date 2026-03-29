@@ -1,4 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 const STORAGE_KEYS = {
   usuarios: "crm_usuarios",
   candidatos: "crm_candidatos",
@@ -702,3 +701,4 @@ function renderDocumentos() {
     }
   );
 }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
