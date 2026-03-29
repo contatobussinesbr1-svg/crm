@@ -1,228 +1,91 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Empresarial</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <section class="login-screen" id="login">
-    <div class="login-panel">
-      <div class="brand-chip">CRM Empresarial</div>
-      <h1>Painel interno da empresa</h1>
-      <p>Entre com um usuario cadastrado para acessar o CRM.</p>
+<!-- ADICIONA ISSO ANTES DO </body> -->
 
-      <form id="login-form" class="stack-form">
-        <label for="user">Usuario</label>
-        <input id="user" name="user" type="text" placeholder="Digite seu usuario" required>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <label for="pass">Senha</label>
-        <input id="pass" name="pass" type="password" placeholder="Digite sua senha" required>
+<script>
+const supabase = window.supabase.createClient(
+  "https://vlywfccnhbrrolsuaqad.supabase.co",
+  "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
+);
 
-        <button type="submit">Entrar</button>
-      </form>
-    </div>
-  </section>
+/* NAV */
+document.querySelectorAll(".nav-button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
+    document.getElementById(btn.dataset.section).classList.remove("hidden");
+  };
+});
 
-  <div class="app-shell hidden" id="app">
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <p class="sidebar-kicker">Painel interno</p>
-        <h2>CRM</h2>
-      </div>
+/* LOGIN SIMPLES */
+document.getElementById("login-form").onsubmit = e=>{
+  e.preventDefault();
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").classList.remove("hidden");
+};
 
-      <nav class="nav">
-        <button class="nav-button active" data-section="dashboard">Dashboard</button>
-        <button class="nav-button" data-section="recrutamento">Recrutamento</button>
-        <button class="nav-button" data-section="treinamento">Treinamento</button>
-        <button class="nav-button" data-section="funcionarios">Funcionarios</button>
-        <button class="nav-button" data-section="departamentos">Departamentos</button>
-        <button class="nav-button" data-section="financeiro">Financeiro</button>
-        <button class="nav-button" data-section="documentos">Documentos</button>
-        <button class="nav-button" data-section="relatorios">Relatorios</button>
-        <button class="nav-button" data-section="config">Configuracoes</button>
-      </nav>
-    </aside>
+/* =========================
+   DOCUMENTOS (SUPABASE)
+========================= */
 
-    <main class="content">
-      <section id="dashboard" class="card section">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Visao geral</p>
-            <h1>Dashboard</h1>
-          </div>
-        </div>
+const input = document.getElementById("docInput");
+const lista = document.getElementById("listaDocs");
 
-        <div class="stats-grid dashboard-grid">
-          <article class="stat-card dashboard-card" data-section-target="recrutamento">
-            <span>Total candidatos</span>
-            <strong id="dashboard-candidatos">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="funcionarios">
-            <span>Total funcionarios</span>
-            <strong id="dashboard-funcionarios">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="treinamento">
-            <span>Em treinamento</span>
-            <strong id="dashboard-treinamento">0</strong>
-          </article>
-          <article class="stat-card dashboard-card" data-section-target="documentos">
-            <span>Documentos</span>
-            <strong id="dashboard-documentos">0</strong>
-          </article>
-        </div>
-      </section>
+input.addEventListener("change", async ()=>{
+  const file = input.files[0];
+  if(!file) return;
 
-      <section id="recrutamento" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Talentos</p>
-            <h1>Recrutamento</h1>
-          </div>
-        </div>
+  const nome = Date.now()+"_"+file.name;
 
-        <form id="candidate-form" class="stack-form">
-          <label for="nomeCandidato">Nome completo</label>
-          <input id="nomeCandidato" name="nomeCandidato" type="text" required>
+  await supabase.storage.from("docs").upload(nome, file);
 
-          <label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="nascimento" type="date">
+  listarDocs();
+});
 
-          <label for="cidade">Cidade</label>
-          <input id="cidade" name="cidade" type="text" required>
+/* LISTAR */
+async function listarDocs(){
+  lista.innerHTML = "";
 
-          <label for="cargo">Departamento</label>
-          <input id="cargo" name="cargo" type="text" placeholder="Ex: Financeiro, RH" required>
+  const { data } = await supabase.storage.from("docs").list();
 
-          <button type="submit">Adicionar candidato</button>
-        </form>
+  data.forEach(file=>{
+    const url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
 
-        <ul id="listaCandidatos" class="data-list"></ul>
-      </section>
+    lista.innerHTML += `
+      <li>
+        ${file.name}
 
-      <section id="treinamento" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Desenvolvimento</p>
-            <h1>Treinamento</h1>
-          </div>
-        </div>
+        <button onclick="abrir('${url}')">Abrir</button>
+        <button onclick="word('${url}')">Word</button>
+        <button onclick="imprimir('${url}')">Imprimir</button>
+        <button onclick="deletar('${file.name}')">Excluir</button>
+      </li>
+    `;
+  });
+}
 
-        <ul id="treinamentoLista" class="data-list"></ul>
-      </section>
+/* ABRIR */
+function abrir(url){
+  window.open(url, "_blank");
+}
 
-      <section id="funcionarios" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Time ativo</p>
-            <h1>Funcionarios</h1>
-          </div>
-        </div>
+/* ABRIR NO WORD */
+function word(url){
+  window.open("https://view.officeapps.live.com/op/view.aspx?src="+url, "_blank");
+}
 
-        <ul id="funcLista" class="data-list"></ul>
-      </section>
+/* IMPRIMIR */
+function imprimir(url){
+  let win = window.open(url);
+  win.onload = ()=> win.print();
+}
 
-      <section id="departamentos" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Estrutura</p>
-            <h1>Departamentos</h1>
-          </div>
-        </div>
+/* DELETE */
+async function deletar(nome){
+  await supabase.storage.from("docs").remove([nome]);
+  listarDocs();
+}
 
-        <form id="department-form" class="inline-form single-inline-form">
-          <input id="novoDept" name="novoDept" type="text" placeholder="Novo departamento" required>
-          <button type="submit">Criar</button>
-        </form>
+/* LOAD */
+listarDocs();
 
-        <div class="department-grid">
-          <ul id="deptLista" class="data-list"></ul>
-          <div id="detalheDept" class="detail-card">
-            <h3>Detalhes do departamento</h3>
-            <p>Selecione um departamento para ver as pessoas relacionadas.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="financeiro" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Folha</p>
-            <h1>Financeiro</h1>
-          </div>
-        </div>
-
-        <form id="salary-form" class="inline-form">
-          <input id="nomeSalario" name="nomeSalario" type="text" placeholder="Nome funcionario" required>
-          <input id="salario" name="salario" type="number" min="0" step="0.01" placeholder="Salario" required>
-          <button type="submit">Adicionar</button>
-        </form>
-
-        <ul id="salariosLista" class="data-list"></ul>
-      </section>
-
-      <section id="documentos" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Arquivos</p>
-            <h1>Documentos</h1>
-          </div>
-        </div>
-
-        <label class="file-upload" for="docInput">
-          <span>Selecionar documento</span>
-          <input id="docInput" type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
-        </label>
-
-        <ul id="listaDocs" class="data-list"></ul>
-      </section>
-
-      <section id="relatorios" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Indicadores</p>
-            <h1>Relatorios</h1>
-          </div>
-        </div>
-
-        <div class="stats-grid two-cols">
-          <article class="report-card">
-            <span>Total candidatos</span>
-            <strong id="totalCandRelatorio">0</strong>
-          </article>
-          <article class="report-card">
-            <span>Total funcionarios</span>
-            <strong id="totalFuncRelatorio">0</strong>
-          </article>
-        </div>
-      </section>
-
-      <section id="config" class="card section hidden">
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">Acesso</p>
-            <h1>Configuracoes</h1>
-          </div>
-        </div>
-
-        <div class="subsection no-top">
-          <h3>Criar usuario</h3>
-          <form id="user-form" class="inline-form">
-            <input id="novoUser" name="novoUser" type="text" placeholder="Usuario" required>
-            <input id="novaPassUser" name="novaPassUser" type="password" placeholder="Senha" required>
-            <button type="submit">Criar</button>
-          </form>
-        </div>
-
-        <ul id="listaUsers" class="data-list"></ul>
-      </section>
-    </main>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+<script src="script.js"></script>
