@@ -1,14 +1,20 @@
-<!-- ADICIONA ISSO ANTES DO </body> -->
-
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
+/* =========================
+   SUPABASE CERTO
+========================= */
+const { createClient } = supabase;
+
+const supabaseClient = createClient(
   "https://vlywfccnhbrrolsuaqad.supabase.co",
   "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
 );
 
-/* NAV */
+/* =========================
+   NAV
+========================= */
 document.querySelectorAll(".nav-button").forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
@@ -16,7 +22,9 @@ document.querySelectorAll(".nav-button").forEach(btn=>{
   };
 });
 
-/* LOGIN SIMPLES */
+/* =========================
+   LOGIN
+========================= */
 document.getElementById("login-form").onsubmit = e=>{
   e.preventDefault();
   document.getElementById("login").style.display="none";
@@ -24,19 +32,19 @@ document.getElementById("login-form").onsubmit = e=>{
 };
 
 /* =========================
-   DOCUMENTOS (SUPABASE)
+   DOCUMENTOS (FUNCIONANDO)
 ========================= */
-
 const input = document.getElementById("docInput");
 const lista = document.getElementById("listaDocs");
 
+/* UPLOAD */
 input.addEventListener("change", async ()=>{
   const file = input.files[0];
   if(!file) return;
 
   const nome = Date.now()+"_"+file.name;
 
-  await supabase.storage.from("docs").upload(nome, file);
+  await supabaseClient.storage.from("docs").upload(nome, file);
 
   listarDocs();
 });
@@ -45,7 +53,9 @@ input.addEventListener("change", async ()=>{
 async function listarDocs(){
   lista.innerHTML = "";
 
-  const { data } = await supabase.storage.from("docs").list();
+  const { data } = await supabaseClient.storage.from("docs").list();
+
+  if(!data) return;
 
   data.forEach(file=>{
     const url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
@@ -54,38 +64,35 @@ async function listarDocs(){
       <li>
         ${file.name}
 
-        <button onclick="abrir('${url}')">Abrir</button>
-        <button onclick="word('${url}')">Word</button>
-        <button onclick="imprimir('${url}')">Imprimir</button>
-        <button onclick="deletar('${file.name}')">Excluir</button>
+        <button onclick="abrirDoc('${url}')">Abrir</button>
+        <button onclick="abrirWord('${url}')">Word</button>
+        <button onclick="imprimirDoc('${url}')">Imprimir</button>
+        <button onclick="deletarDoc('${file.name}')">Excluir</button>
       </li>
     `;
   });
 }
 
-/* ABRIR */
-function abrir(url){
+/* FUNÇÕES */
+function abrirDoc(url){
   window.open(url, "_blank");
 }
 
-/* ABRIR NO WORD */
-function word(url){
+function abrirWord(url){
   window.open("https://view.officeapps.live.com/op/view.aspx?src="+url, "_blank");
 }
 
-/* IMPRIMIR */
-function imprimir(url){
+function imprimirDoc(url){
   let win = window.open(url);
   win.onload = ()=> win.print();
 }
 
-/* DELETE */
-async function deletar(nome){
-  await supabase.storage.from("docs").remove([nome]);
+async function deletarDoc(nome){
+  await supabaseClient.storage.from("docs").remove([nome]);
   listarDocs();
 }
 
 /* LOAD */
 listarDocs();
 
-<script src="script.js"></script>
+</script>
