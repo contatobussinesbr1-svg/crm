@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 const STORAGE_KEYS = {
   usuarios: "crm_usuarios",
   candidatos: "crm_candidatos",
@@ -621,3 +622,83 @@ if (localStorage.getItem("crm_logado") === "true") {
 }
 
 refreshUI();
+/* =========================
+   SUPABASE CONFIG
+========================= */
+const supabase = window.supabase.createClient(
+  "https://vlywfccnhbrrolsuaqad.supabase.co",
+  "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
+);
+
+/* =========================
+   UPLOAD REAL (SUBSTITUI LOCAL)
+========================= */
+
+docInput.addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const nome = Date.now() + "_" + file.name;
+
+  // upload pro supabase
+  await supabase.storage.from("docs").upload(nome, file);
+
+  // salvar no sistema
+  state.documentos.unshift({
+    nome: file.name,
+    file: nome,
+    data: formatNow()
+  });
+
+  saveState();
+  refreshUI();
+  docInput.value = "";
+});
+
+/* =========================
+   RENDER DOCUMENTOS (ATUALIZADO)
+========================= */
+
+function renderDocumentos() {
+  renderList(
+    "listaDocs",
+    state.documentos,
+    "Nenhum documento importado.",
+    (documento, index) => {
+      const item = document.createElement("li");
+      item.className = "data-item";
+
+      const url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${documento.file}`;
+
+      const info = document.createElement("div");
+      info.innerHTML = `
+        <strong>${documento.nome}</strong>
+        <p>Importado em: ${documento.data}</p>
+      `;
+
+      const actions = document.createElement("div");
+      actions.className = "item-actions";
+
+      actions.appendChild(createActionButton("Abrir", "success-button", () => {
+        window.open(url, "_blank");
+      }));
+
+      actions.appendChild(createActionButton("Word", "success-button", () => {
+        window.open("https://view.officeapps.live.com/op/view.aspx?src=" + url, "_blank");
+      }));
+
+      actions.appendChild(createActionButton("Imprimir", "success-button", () => {
+        let win = window.open(url);
+        win.onload = () => win.print();
+      }));
+
+      actions.appendChild(createActionButton("Excluir", "danger-button", async () => {
+        await supabase.storage.from("docs").remove([documento.file]);
+        removerDocumento(index);
+      }));
+
+      item.append(info, actions);
+      return item;
+    }
+  );
+}
