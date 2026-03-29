@@ -2,13 +2,43 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>CRM com Documentos</title>
+<title>CRM Profissional</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <style>
-body { font-family:Arial; background:#f4f6f8; margin:0; }
+body { margin:0; font-family:Arial; background:#f4f6f8; }
 
+/* LOGIN */
+.login {
+  display:flex;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
+}
+.login-box {
+  background:white;
+  padding:30px;
+  border-radius:10px;
+  width:300px;
+}
+input, button {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+}
+button {
+  background:#6366f1;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* APP */
+.app { display:none; }
+
+/* SIDEBAR */
 .sidebar {
   width:220px;
   height:100vh;
@@ -17,49 +47,78 @@ body { font-family:Arial; background:#f4f6f8; margin:0; }
   position:fixed;
   padding:20px;
 }
+.sidebar button {
+  background:none;
+  color:white;
+  border:none;
+  text-align:left;
+  margin:5px 0;
+  cursor:pointer;
+}
 
-.content { margin-left:240px; padding:20px; }
+/* CONTENT */
+.content {
+  margin-left:240px;
+  padding:20px;
+}
 
+/* CARD */
 .card {
   background:white;
   padding:20px;
   border-radius:10px;
 }
 
-button {
-  padding:8px;
-  margin:5px;
-  cursor:pointer;
-  border:none;
-  border-radius:6px;
-}
-
-.btn-download { background:#60a5fa; }
-.btn-delete { background:#ef4444; color:white; }
-.btn-print { background:#34d399; }
+/* BOTÕES */
+.btn { padding:6px 10px; margin:3px; border-radius:6px; border:none; cursor:pointer; }
+.open { background:#60a5fa; }
+.print { background:#34d399; }
+.delete { background:#ef4444; color:white; }
 
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input id="user" placeholder="Usuário">
+    <input id="pass" type="password" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
 <div class="sidebar">
 <h3>CRM</h3>
+<button onclick="mostrar('dashboard')">Dashboard</button>
 <button onclick="mostrar('docs')">Documentos</button>
+<button onclick="logout()">Sair</button>
 </div>
 
 <div class="content">
 
-<div id="docs" class="card">
+<!-- DASH -->
+<div id="dashboard" class="card">
+<h2>Dashboard</h2>
+<p>Bem-vinda ao sistema 👋</p>
+</div>
+
+<!-- DOCUMENTOS -->
+<div id="docs" class="card" style="display:none">
 <h2>Documentos</h2>
 
 <input type="file" id="fileInput">
-<button onclick="upload()">Enviar</button>
+<button onclick="upload()">Enviar Documento</button>
 
 <ul id="listaDocs"></ul>
-
 </div>
 
+</div>
 </div>
 
 <script>
@@ -68,9 +127,22 @@ const supabase = window.supabase.createClient(
   "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
 );
 
+/* LOGIN SIMPLES */
+function entrar(){
+  login.style.display="none";
+  app.style.display="block";
+  listar();
+}
+
+function logout(){
+  app.style.display="none";
+  login.style.display="flex";
+}
+
+/* MENU */
 function mostrar(sec){
-document.querySelectorAll(".card").forEach(c=>c.style.display="none");
-document.getElementById(sec).style.display="block";
+  document.querySelectorAll(".card").forEach(c=>c.style.display="none");
+  document.getElementById(sec).style.display="block";
 }
 
 /* UPLOAD */
@@ -78,9 +150,9 @@ async function upload(){
   let file = fileInput.files[0];
   if(!file) return alert("Escolhe um arquivo");
 
-  let { data, error } = await supabase.storage
+  let { error } = await supabase.storage
     .from('docs')
-    .upload(file.name, file);
+    .upload(Date.now()+"_"+file.name, file);
 
   if(error){
     alert("Erro ao enviar");
@@ -99,34 +171,29 @@ async function listar(){
     let url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
 
     listaDocs.innerHTML += `
-    <li>
-      ${file.name}
-
-      <button class="btn-download" onclick="abrir('${url}')">Abrir</button>
-      <button class="btn-print" onclick="imprimir('${url}')">Imprimir</button>
-      <button class="btn-delete" onclick="deletar('${file.name}')">Excluir</button>
+    <li style="margin:10px 0;">
+      ${file.name}<br>
+      <button class="btn open" onclick="abrir('${url}')">Abrir</button>
+      <button class="btn print" onclick="imprimir('${url}')">Imprimir</button>
+      <button class="btn delete" onclick="deletar('${file.name}')">Excluir</button>
     </li>`;
   });
 }
 
-/* ABRIR */
+/* AÇÕES */
 function abrir(url){
   window.open(url, '_blank');
 }
 
-/* IMPRIMIR */
 function imprimir(url){
-  let win = window.open(url);
-  win.onload = () => win.print();
+  let w = window.open(url);
+  w.onload = () => w.print();
 }
 
-/* DELETE */
 async function deletar(nome){
   await supabase.storage.from('docs').remove([nome]);
   listar();
 }
-
-listar();
 </script>
 
 </body>
