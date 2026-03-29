@@ -1,9 +1,7 @@
 /* =========================
    SUPABASE
 ========================= */
-const { createClient } = supabase;
-
-const supabaseClient = createClient(
+const supabase = window.supabase.createClient(
   "https://vlywfccnhbrrolsuaqad.supabase.co",
   "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
 );
@@ -17,73 +15,69 @@ const STORAGE_KEYS = {
   treinamento: "crm_treinamento",
   funcionarios: "crm_funcionarios",
   departamentos: "crm_departamentos",
-  salarios: "crm_salarios",
-  documentos: "crm_documentos"
+  salarios: "crm_salarios"
 };
 
-const defaultUsers = [{ user: "admin", pass: "123" }];
-const defaultDepartments = [
-  "Financeiro","Lideranca","Administracao","FTD","Retencao","FTD Pro","Retencao Pro","Recursos Humanos"
-];
-
 const state = {
-  usuarios: JSON.parse(localStorage.getItem(STORAGE_KEYS.usuarios)) || defaultUsers,
+  usuarios: JSON.parse(localStorage.getItem(STORAGE_KEYS.usuarios)) || [{ user:"admin", pass:"123"}],
   candidatos: JSON.parse(localStorage.getItem(STORAGE_KEYS.candidatos)) || [],
   treinamento: JSON.parse(localStorage.getItem(STORAGE_KEYS.treinamento)) || [],
   funcionarios: JSON.parse(localStorage.getItem(STORAGE_KEYS.funcionarios)) || [],
-  departamentos: JSON.parse(localStorage.getItem(STORAGE_KEYS.departamentos)) || defaultDepartments,
-  salarios: JSON.parse(localStorage.getItem(STORAGE_KEYS.salarios)) || [],
-  documentos: JSON.parse(localStorage.getItem(STORAGE_KEYS.documentos)) || []
+  departamentos: JSON.parse(localStorage.getItem(STORAGE_KEYS.departamentos)) || ["RH","Financeiro"],
+  salarios: JSON.parse(localStorage.getItem(STORAGE_KEYS.salarios)) || []
 };
 
 /* =========================
-   SAVE
+   SALVAR
 ========================= */
-function saveAll() {
-  Object.keys(STORAGE_KEYS).forEach(key => {
-    localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(state[key]));
-  });
+function saveAll(){
+  localStorage.setItem(STORAGE_KEYS.candidatos, JSON.stringify(state.candidatos));
+  localStorage.setItem(STORAGE_KEYS.treinamento, JSON.stringify(state.treinamento));
+  localStorage.setItem(STORAGE_KEYS.funcionarios, JSON.stringify(state.funcionarios));
+  localStorage.setItem(STORAGE_KEYS.departamentos, JSON.stringify(state.departamentos));
+  localStorage.setItem(STORAGE_KEYS.salarios, JSON.stringify(state.salarios));
 }
 
 /* =========================
    LOGIN
 ========================= */
-loginForm.addEventListener("submit", e => {
+document.getElementById("login-form").onsubmit = e=>{
   e.preventDefault();
 
   const u = user.value;
   const p = pass.value;
 
-  const ok = state.usuarios.find(x => x.user === u && x.pass === p);
+  const ok = state.usuarios.find(x=>x.user===u && x.pass===p);
 
-  if (!ok) return alert("Login inválido");
+  if(!ok){
+    alert("Login inválido");
+    return;
+  }
 
-  login.classList.add("hidden");
-  app.classList.remove("hidden");
-  localStorage.setItem("crm_logado", "true");
-  renderAll();
-});
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").classList.remove("hidden");
+};
 
 /* =========================
    NAV
 ========================= */
-navButtons.forEach(btn => {
-  btn.onclick = () => {
-    sections.forEach(s => s.classList.add("hidden"));
+document.querySelectorAll(".nav-button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
     document.getElementById(btn.dataset.section).classList.remove("hidden");
   };
 });
 
 /* =========================
-   CANDIDATOS
+   RECRUTAMENTO
 ========================= */
-candidateForm.onsubmit = e => {
+candidateForm.onsubmit = e=>{
   e.preventDefault();
 
   state.candidatos.unshift({
-    nome: nomeCandidato.value,
-    cidade: cidade.value,
-    cargo: cargo.value
+    nome:nomeCandidato.value,
+    cidade:cidade.value,
+    cargo:cargo.value
   });
 
   saveAll();
@@ -91,132 +85,122 @@ candidateForm.onsubmit = e => {
   candidateForm.reset();
 };
 
-function aprovar(i) {
-  state.treinamento.push(state.candidatos[i]);
+function aprovar(i){
+  state.treinamento.unshift(state.candidatos[i]);
   state.candidatos.splice(i,1);
-  saveAll(); renderAll();
+  saveAll();
+  renderAll();
 }
 
 /* =========================
    TREINAMENTO
 ========================= */
-function contratar(i) {
-  state.funcionarios.push(state.treinamento[i]);
+function contratar(i){
+  state.funcionarios.unshift(state.treinamento[i]);
   state.treinamento.splice(i,1);
-  saveAll(); renderAll();
-}
-
-/* =========================
-   DOCUMENTOS (SUPABASE REAL)
-========================= */
-
-docInput.addEventListener("change", async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const nome = Date.now() + "_" + file.name;
-
-  await supabaseClient.storage.from("docs").upload(nome, file);
-
-  state.documentos.unshift({
-    nome: file.name,
-    file: nome,
-    data: new Date().toLocaleString()
-  });
-
   saveAll();
   renderAll();
-});
+}
 
 /* =========================
    RENDER
 ========================= */
-function renderAll() {
-  renderCandidatos();
-  renderTreino();
-  renderFunc();
-  renderDocs();
-}
+function renderAll(){
 
-/* =========================
-   LISTAS
-========================= */
-function renderCandidatos() {
-  listaCandidatos.innerHTML = "";
+  /* CANDIDATOS */
+  listaCandidatos.innerHTML="";
   state.candidatos.forEach((c,i)=>{
     listaCandidatos.innerHTML += `
-    <li>
-      ${c.nome} - ${c.cargo}
-      <button onclick="aprovar(${i})">Aprovar</button>
-    </li>`;
+      <li>
+        ${c.nome} - ${c.cargo}
+        <button onclick="aprovar(${i})">Aprovar</button>
+      </li>`;
   });
-}
 
-function renderTreino() {
-  treinamentoLista.innerHTML = "";
+  /* TREINAMENTO */
+  treinamentoLista.innerHTML="";
   state.treinamento.forEach((c,i)=>{
     treinamentoLista.innerHTML += `
-    <li>
-      ${c.nome}
-      <button onclick="contratar(${i})">Contratar</button>
-    </li>`;
+      <li>
+        ${c.nome}
+        <button onclick="contratar(${i})">Contratar</button>
+      </li>`;
   });
-}
 
-function renderFunc() {
-  funcLista.innerHTML = "";
+  /* FUNCIONARIOS */
+  funcLista.innerHTML="";
   state.funcionarios.forEach(f=>{
-    funcLista.innerHTML += `<li>${f.nome}</li>`;
+    funcLista.innerHTML += `<li>${f.nome} - ${f.cargo}</li>`;
   });
+
+  /* DASHBOARD */
+  document.getElementById("dashboard-candidatos").innerText = state.candidatos.length;
+  document.getElementById("dashboard-funcionarios").innerText = state.funcionarios.length;
+  document.getElementById("dashboard-treinamento").innerText = state.treinamento.length;
+
 }
 
 /* =========================
-   DOCUMENTOS UI
+   DOCUMENTOS (REAL)
 ========================= */
-function renderDocs() {
-  listaDocs.innerHTML = "";
 
-  state.documentos.forEach((doc,i)=>{
+const input = document.getElementById("docInput");
+const lista = document.getElementById("listaDocs");
 
-    const url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${doc.file}`;
+input.addEventListener("change", async ()=>{
+  const file = input.files[0];
+  if(!file) return;
 
-    listaDocs.innerHTML += `
-    <li>
-      ${doc.nome}
+  const nome = Date.now()+"_"+file.name;
 
-      <button onclick="window.open('${url}')">Abrir</button>
+  await supabase.storage.from("docs").upload(nome, file);
 
-      <button onclick="window.open('https://view.officeapps.live.com/op/view.aspx?src=${url}')">
-        Word
-      </button>
+  listarDocs();
+});
 
-      <button onclick="imprimirDoc('${url}')">Imprimir</button>
+/* LISTAR */
+async function listarDocs(){
+  lista.innerHTML = "";
 
-      <button onclick="excluirDoc(${i})">Excluir</button>
-    </li>`;
+  const { data } = await supabase.storage.from("docs").list();
+
+  data.forEach(file=>{
+    const url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
+
+    lista.innerHTML += `
+      <li>
+        ${file.name}
+
+        <button onclick="abrir('${url}')">Abrir</button>
+        <button onclick="word('${url}')">Word</button>
+        <button onclick="imprimir('${url}')">Imprimir</button>
+        <button onclick="deletar('${file.name}')">Excluir</button>
+      </li>
+    `;
   });
+
+  document.getElementById("dashboard-documentos").innerText = data.length;
 }
 
-function imprimirDoc(url){
-  let w = window.open(url);
-  w.onload = () => w.print();
+/* AÇÕES */
+function abrir(url){
+  window.open(url, "_blank");
 }
 
-async function excluirDoc(i){
-  const file = state.documentos[i].file;
-
-  await supabaseClient.storage.from("docs").remove([file]);
-
-  state.documentos.splice(i,1);
-  saveAll();
-  renderAll();
+function word(url){
+  window.open("https://view.officeapps.live.com/op/view.aspx?src="+url, "_blank");
 }
 
-/* =========================
-   AUTO LOGIN
-========================= */
-if(localStorage.getItem("crm_logado")){
-  login.classList.add("hidden");
-  app.classList.remove("hidden");
-  renderAll();
+function imprimir(url){
+  let win = window.open(url);
+  win.onload = ()=> win.print();
 }
+
+async function deletar(nome){
+  await supabase.storage.from("docs").remove([nome]);
+  listarDocs();
+}
+
+/* INIT */
+renderAll();
+listarDocs();
