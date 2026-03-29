@@ -2,68 +2,64 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>CRM Empresarial</title>
+<title>CRM com Documentos</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <style>
-body { margin:0; font-family:Arial; background:#f4f6f8; }
-.login { display:flex; height:100vh; justify-content:center; align-items:center; }
-.login-box { background:white; padding:30px; border-radius:10px; width:300px; }
-input, button { width:100%; padding:10px; margin:5px 0; }
-button { background:#a5b4fc; border:none; cursor:pointer; border-radius:6px; }
-.app { display:none; }
-.sidebar { width:220px; height:100vh; background:#1e293b; color:white; position:fixed; padding:20px; }
-.sidebar button { background:none; color:white; border:none; text-align:left; margin:5px 0; cursor:pointer; }
+body { font-family:Arial; background:#f4f6f8; margin:0; }
+
+.sidebar {
+  width:220px;
+  height:100vh;
+  background:#1e293b;
+  color:white;
+  position:fixed;
+  padding:20px;
+}
+
 .content { margin-left:240px; padding:20px; }
-.card { background:white; padding:20px; border-radius:10px; margin-bottom:20px; }
+
+.card {
+  background:white;
+  padding:20px;
+  border-radius:10px;
+}
+
+button {
+  padding:8px;
+  margin:5px;
+  cursor:pointer;
+  border:none;
+  border-radius:6px;
+}
+
+.btn-download { background:#60a5fa; }
+.btn-delete { background:#ef4444; color:white; }
+.btn-print { background:#34d399; }
+
 </style>
 </head>
 
 <body>
 
-<div class="login" id="login">
-  <div class="login-box">
-    <h2>Login</h2>
-    <input id="user" placeholder="Usuário">
-    <input id="pass" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-  </div>
-</div>
-
-<div class="app" id="app">
-
 <div class="sidebar">
 <h3>CRM</h3>
-<button onclick="mostrar('dashboard')">Dashboard</button>
-<button onclick="mostrar('recrutamento')">Recrutamento</button>
-<button onclick="mostrar('funcionarios')">Funcionários</button>
-<button onclick="logout()">Sair</button>
+<button onclick="mostrar('docs')">Documentos</button>
 </div>
 
 <div class="content">
 
-<div id="dashboard" class="card">
-<h2>Dashboard</h2>
-<p>Total candidatos: <span id="dashCand">0</span></p>
-<p>Total funcionários: <span id="dashFunc">0</span></p>
-</div>
+<div id="docs" class="card">
+<h2>Documentos</h2>
 
-<div id="recrutamento" class="card" style="display:none">
-<h2>Recrutamento</h2>
-<input id="nomeCandidato" placeholder="Nome">
-<input id="cidade" placeholder="Cidade">
-<input id="cargo" placeholder="Cargo">
-<button onclick="addCandidato()">Adicionar</button>
-<ul id="listaCandidatos"></ul>
-</div>
+<input type="file" id="fileInput">
+<button onclick="upload()">Enviar</button>
 
-<div id="funcionarios" class="card" style="display:none">
-<h2>Funcionários</h2>
-<ul id="funcLista"></ul>
-</div>
+<ul id="listaDocs"></ul>
 
 </div>
+
 </div>
 
 <script>
@@ -72,58 +68,65 @@ const supabase = window.supabase.createClient(
   "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
 );
 
-/* LOGIN SIMPLES */
-function login(){
-  login.style.display="none";
-  app.style.display="block";
-  carregarDados();
-}
-
-function logout(){
-  app.style.display="none";
-  login.style.display="flex";
-}
-
-/* NAV */
 function mostrar(sec){
 document.querySelectorAll(".card").forEach(c=>c.style.display="none");
 document.getElementById(sec).style.display="block";
 }
 
-/* DADOS */
-let candidatos = [];
-let funcionarios = [];
+/* UPLOAD */
+async function upload(){
+  let file = fileInput.files[0];
+  if(!file) return alert("Escolhe um arquivo");
 
-/* ADD */
-async function addCandidato(){
-  await supabase.from("candidatos").insert([
-    {
-      nome: nomeCandidato.value,
-      cidade: cidade.value,
-      cargo: cargo.value
-    }
-  ]);
+  let { data, error } = await supabase.storage
+    .from('docs')
+    .upload(file.name, file);
 
-  carregarDados();
+  if(error){
+    alert("Erro ao enviar");
+  } else {
+    listar();
+  }
 }
 
-/* CARREGAR */
-async function carregarDados(){
-  let { data } = await supabase.from("candidatos").select("*");
-  candidatos = data || [];
-  render();
-}
+/* LISTAR */
+async function listar(){
+  let { data } = await supabase.storage.from('docs').list();
 
-/* RENDER */
-function render(){
-  listaCandidatos.innerHTML="";
-  candidatos.forEach((c)=>{
-    listaCandidatos.innerHTML+=`<li>${c.nome} - ${c.cargo}</li>`;
+  listaDocs.innerHTML="";
+
+  data.forEach(file=>{
+    let url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
+
+    listaDocs.innerHTML += `
+    <li>
+      ${file.name}
+
+      <button class="btn-download" onclick="abrir('${url}')">Abrir</button>
+      <button class="btn-print" onclick="imprimir('${url}')">Imprimir</button>
+      <button class="btn-delete" onclick="deletar('${file.name}')">Excluir</button>
+    </li>`;
   });
-
-  dashCand.innerText=candidatos.length;
 }
 
+/* ABRIR */
+function abrir(url){
+  window.open(url, '_blank');
+}
+
+/* IMPRIMIR */
+function imprimir(url){
+  let win = window.open(url);
+  win.onload = () => win.print();
+}
+
+/* DELETE */
+async function deletar(nome){
+  await supabase.storage.from('docs').remove([nome]);
+  listar();
+}
+
+listar();
 </script>
 
 </body>
