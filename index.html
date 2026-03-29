@@ -1,39 +1,19 @@
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>CRM Profissional</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<title>CRM Empresarial</title>
 
 <style>
 body { margin:0; font-family:Arial; background:#f4f6f8; }
 
 /* LOGIN */
-.login {
-  display:flex;
-  height:100vh;
-  justify-content:center;
-  align-items:center;
-}
-.login-box {
-  background:white;
-  padding:30px;
-  border-radius:10px;
-  width:300px;
-}
-input, button {
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-}
-button {
-  background:#6366f1;
-  color:white;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
+.login { display:flex; height:100vh; justify-content:center; align-items:center; }
+.login-box { background:white; padding:30px; border-radius:10px; width:300px; }
+
+/* INPUT */
+input, button { width:100%; padding:10px; margin:5px 0; }
+button { background:#a5b4fc; color:#333; border:none; cursor:pointer; border-radius:6px; }
 
 /* APP */
 .app { display:none; }
@@ -47,6 +27,7 @@ button {
   position:fixed;
   padding:20px;
 }
+
 .sidebar button {
   background:none;
   color:white;
@@ -57,143 +38,344 @@ button {
 }
 
 /* CONTENT */
-.content {
-  margin-left:240px;
-  padding:20px;
-}
+.content { margin-left:240px; padding:20px; }
 
 /* CARD */
 .card {
   background:white;
   padding:20px;
   border-radius:10px;
+  margin-bottom:20px;
 }
 
-/* BOTÕES */
-.btn { padding:6px 10px; margin:3px; border-radius:6px; border:none; cursor:pointer; }
-.open { background:#60a5fa; }
-.print { background:#34d399; }
-.delete { background:#ef4444; color:white; }
+/* DASHBOARD PASTEL */
+.pastel-card {
+  flex:1;
+  min-width:200px;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  cursor:pointer;
+}
+
+.p1 { background:#fde2e4; }
+.p2 { background:#e2f0cb; }
+.p3 { background:#cde7f0; }
+.p4 { background:#fce1b4; }
 
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div class="login" id="login">
   <div class="login-box">
     <h2>Login</h2>
     <input id="user" placeholder="Usuário">
     <input id="pass" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
+    <button onclick="login()">Entrar</button>
   </div>
 </div>
 
-<!-- APP -->
 <div class="app" id="app">
 
 <div class="sidebar">
 <h3>CRM</h3>
+
 <button onclick="mostrar('dashboard')">Dashboard</button>
-<button onclick="mostrar('docs')">Documentos</button>
+<button onclick="mostrar('recrutamento')">Recrutamento</button>
+<button onclick="mostrar('treinamento')">Treinamento</button>
+<button onclick="mostrar('funcionarios')">Funcionários</button>
+<button onclick="mostrar('departamentos')">Departamentos</button>
+<button onclick="mostrar('financeiro')">Financeiro</button>
+<button onclick="mostrar('documentos')">Documentos</button>
+<button onclick="mostrar('relatorios')">Relatórios</button>
+<button onclick="mostrar('config')">Configurações</button>
+
 <button onclick="logout()">Sair</button>
 </div>
 
 <div class="content">
 
-<!-- DASH -->
+<!-- DASHBOARD -->
 <div id="dashboard" class="card">
+
 <h2>Dashboard</h2>
-<p>Bem-vinda ao sistema 👋</p>
+
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+<div onclick="mostrar('recrutamento')" class="pastel-card p1">
+<p>Total candidatos</p>
+<h1 id="dashCand">0</h1>
 </div>
 
-<!-- DOCUMENTOS -->
-<div id="docs" class="card" style="display:none">
-<h2>Documentos</h2>
+<div onclick="mostrar('funcionarios')" class="pastel-card p2">
+<p>Total funcionários</p>
+<h1 id="dashFunc">0</h1>
+</div>
 
-<input type="file" id="fileInput">
-<button onclick="upload()">Enviar Documento</button>
+<div onclick="mostrar('treinamento')" class="pastel-card p3">
+<p>Em treinamento</p>
+<h1 id="dashTreino">0</h1>
+</div>
 
-<ul id="listaDocs"></ul>
+<div onclick="mostrar('documentos')" class="pastel-card p4">
+<p>Documentos</p>
+<h1 id="dashDocs">0</h1>
+</div>
+
+</div>
+</div>
+
+<!-- RECRUTAMENTO -->
+<div id="recrutamento" class="card" style="display:none">
+<h2>Recrutamento</h2>
+
+<input id="nomeCandidato" placeholder="Nome">
+<input id="cidade" placeholder="Cidade">
+<input id="cargo" placeholder="Departamento">
+
+<button onclick="addCandidato()">Adicionar</button>
+<ul id="listaCandidatos"></ul>
+</div>
+
+<!-- TREINAMENTO -->
+<div id="treinamento" class="card" style="display:none">
+<h2>Treinamento</h2>
+<ul id="treinamentoLista"></ul>
+</div>
+
+<!-- FUNCIONARIOS -->
+<div id="funcionarios" class="card" style="display:none">
+<h2>Funcionários</h2>
+<ul id="funcLista"></ul>
+</div>
+
+<!-- DEPARTAMENTOS -->
+<div id="departamentos" class="card" style="display:none">
+<h2>Departamentos</h2>
+
+<input id="novoDept" placeholder="Novo departamento">
+<button onclick="addDept()">Criar</button>
+
+<ul id="deptLista"></ul>
+<div id="detalheDept"></div>
+</div>
+
+<!-- FINANCEIRO -->
+<div id="financeiro" class="card" style="display:none">
+<h2>Financeiro</h2>
+
+<input id="nomeSalario" placeholder="Nome">
+<input id="salario" placeholder="Salário">
+<button onclick="addSalario()">Adicionar</button>
+
+<h3>Calculadora</h3>
+<input id="calc1" placeholder="Valor 1">
+<input id="calc2" placeholder="Valor 2">
+<button onclick="somar()">Somar</button>
+<p id="resultadoCalc"></p>
+
+<ul id="salariosLista"></ul>
+</div>
+
+<!-- CONFIG -->
+<div id="config" class="card" style="display:none">
+<h2>Configurações</h2>
+
+<input id="novoUser" placeholder="Usuário">
+<input id="novaPassUser" placeholder="Senha">
+<button onclick="criarUsuario()">Criar</button>
+
+<h3>Trocar senha</h3>
+<input id="userTroca" placeholder="Usuário">
+<input id="novaSenha" placeholder="Nova senha">
+<button onclick="trocarSenha()">Alterar</button>
+
+<ul id="listaUsers"></ul>
 </div>
 
 </div>
 </div>
 
 <script>
-const supabase = window.supabase.createClient(
-  "https://vlywfccnhbrrolsuaqad.supabase.co",
-  "sb_publishable_LzGdlhfjS1OCoW2LPbyRLg_RVHtLju3"
-);
 
-/* LOGIN SIMPLES */
-function entrar(){
-  login.style.display="none";
-  app.style.display="block";
-  listar();
+/* LOGIN */
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [{user:"admin",pass:"123"}];
+
+function login(){
+let u=user.value,p=pass.value;
+let ok=usuarios.find(x=>x.user===u&&x.pass===p);
+
+if(ok){
+localStorage.setItem("logado","true");
+login.style.display="none";
+app.style.display="block";
+renderAll();
+}else alert("Login inválido");
 }
 
 function logout(){
-  app.style.display="none";
-  login.style.display="flex";
+localStorage.removeItem("logado");
+app.style.display="none";
+login.style.display="flex";
 }
 
-/* MENU */
+/* AUTO LOGIN */
+if(localStorage.getItem("logado")=="true"){
+login.style.display="none";
+app.style.display="block";
+}
+
+/* USERS */
+function criarUsuario(){
+usuarios.push({user:novoUser.value,pass:novaPassUser.value});
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+renderUsers();
+}
+
+function trocarSenha(){
+let i=usuarios.findIndex(x=>x.user===userTroca.value);
+if(i==-1)return alert("Não encontrado");
+usuarios[i].pass=novaSenha.value;
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+alert("Senha alterada");
+}
+
+function renderUsers(){
+listaUsers.innerHTML="";
+usuarios.forEach(u=>listaUsers.innerHTML+=`<li>${u.user}</li>`);
+}
+
+/* NAV */
 function mostrar(sec){
-  document.querySelectorAll(".card").forEach(c=>c.style.display="none");
-  document.getElementById(sec).style.display="block";
+document.querySelectorAll(".card").forEach(c=>c.style.display="none");
+document.getElementById(sec).style.display="block";
 }
 
-/* UPLOAD */
-async function upload(){
-  let file = fileInput.files[0];
-  if(!file) return alert("Escolhe um arquivo");
+/* DADOS */
+let candidatos=JSON.parse(localStorage.getItem("candidatos"))||[];
+let treinamento=JSON.parse(localStorage.getItem("treino"))||[];
+let funcionarios=JSON.parse(localStorage.getItem("func"))||[];
+let dept=JSON.parse(localStorage.getItem("dept"))||[
+"Financeiro","Liderança","Administração","FTD","Retenção","FTD Pro","Retenção Pro","Recursos Humanos"
+];
 
-  let { error } = await supabase.storage
-    .from('docs')
-    .upload(Date.now()+"_"+file.name, file);
-
-  if(error){
-    alert("Erro ao enviar");
-  } else {
-    listar();
-  }
+/* CANDIDATO */
+function addCandidato(){
+candidatos.push({nome:nomeCandidato.value,cidade:cidade.value,cargo:cargo.value});
+salvarTudo();
 }
 
-/* LISTAR */
-async function listar(){
-  let { data } = await supabase.storage.from('docs').list();
-
-  listaDocs.innerHTML="";
-
-  data.forEach(file=>{
-    let url = `https://vlywfccnhbrrolsuaqad.supabase.co/storage/v1/object/public/docs/${file.name}`;
-
-    listaDocs.innerHTML += `
-    <li style="margin:10px 0;">
-      ${file.name}<br>
-      <button class="btn open" onclick="abrir('${url}')">Abrir</button>
-      <button class="btn print" onclick="imprimir('${url}')">Imprimir</button>
-      <button class="btn delete" onclick="deletar('${file.name}')">Excluir</button>
-    </li>`;
-  });
+function renderCand(){
+listaCandidatos.innerHTML="";
+candidatos.forEach((c,i)=>{
+listaCandidatos.innerHTML+=`<li>${c.nome} - ${c.cargo}
+<button onclick="aprovar(${i})">Aprovar</button></li>`;
+});
 }
 
-/* AÇÕES */
-function abrir(url){
-  window.open(url, '_blank');
+function aprovar(i){
+treinamento.push(candidatos[i]);
+candidatos.splice(i,1);
+salvarTudo();
 }
 
-function imprimir(url){
-  let w = window.open(url);
-  w.onload = () => w.print();
+/* TREINO */
+function renderTreino(){
+treinamentoLista.innerHTML="";
+treinamento.forEach((c,i)=>{
+treinamentoLista.innerHTML+=`<li>${c.nome}
+<button onclick="contratar(${i})">Contratar</button></li>`;
+});
 }
 
-async function deletar(nome){
-  await supabase.storage.from('docs').remove([nome]);
-  listar();
+function contratar(i){
+funcionarios.push(treinamento[i]);
+treinamento.splice(i,1);
+salvarTudo();
 }
+
+/* FUNC */
+function renderFunc(){
+funcLista.innerHTML="";
+funcionarios.forEach(f=>{
+funcLista.innerHTML+=`<li>${f.nome} - ${f.cargo}</li>`;
+});
+}
+
+/* DEPT */
+function addDept(){
+dept.push(novoDept.value);
+salvarTudo();
+}
+
+function renderDept(){
+deptLista.innerHTML="";
+dept.forEach(d=>{
+let total=candidatos.filter(c=>c.cargo==d).length+funcionarios.filter(f=>f.cargo==d).length;
+deptLista.innerHTML+=`<li onclick="verDept('${d}')"><b>${d}</b><br>${total} pessoas</li>`;
+});
+}
+
+function verDept(d){
+let html=`<h3>${d}</h3>`;
+let p=[...candidatos.filter(c=>c.cargo==d),...funcionarios.filter(f=>f.cargo==d)];
+p.forEach(x=>html+=`<p>${x.nome}</p>`);
+detalheDept.innerHTML=html;
+}
+
+/* FINANCEIRO */
+let salarios=JSON.parse(localStorage.getItem("sal"))||[];
+
+function addSalario(){
+salarios.push({nome:nomeSalario.value,sal:salario.value});
+salvarTudo();
+}
+
+function renderSal(){
+salariosLista.innerHTML="";
+salarios.forEach(s=>{
+salariosLista.innerHTML+=`<li>${s.nome} - R$ ${s.sal}</li>`;
+});
+}
+
+function somar(){
+let r=parseFloat(calc1.value)+parseFloat(calc2.value);
+resultadoCalc.innerText="Resultado: "+r;
+}
+
+/* SAVE */
+function salvarTudo(){
+localStorage.setItem("candidatos",JSON.stringify(candidatos));
+localStorage.setItem("treino",JSON.stringify(treinamento));
+localStorage.setItem("func",JSON.stringify(funcionarios));
+localStorage.setItem("dept",JSON.stringify(dept));
+localStorage.setItem("sal",JSON.stringify(salarios));
+renderAll();
+}
+
+/* DASH */
+function renderDash(){
+dashCand.innerText=candidatos.length;
+dashFunc.innerText=funcionarios.length;
+dashTreino.innerText=treinamento.length;
+dashDocs.innerText=0;
+}
+
+/* ALL */
+function renderAll(){
+renderCand();
+renderTreino();
+renderFunc();
+renderDept();
+renderSal();
+renderUsers();
+renderDash();
+}
+
+renderAll();
+
 </script>
 
 </body>
