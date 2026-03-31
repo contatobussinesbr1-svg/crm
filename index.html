@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Profissional</title>
+<style>
+:root{
+  --bg:#f3f1ea;
+  --surface:#fffdf8;
+  --surface-strong:#ffffff;
+  --text:#1d2939;
+  --muted:#667085;
+  --line:#e7dfd4;
+  --nav:#152238;
+  --nav-soft:#223453;
+  --accent:#bb5a2c;
+  --accent-strong:#8f3e1a;
+  --success:#147a5c;
+  --warning:#c07b12;
+  --shadow:0 18px 50px rgba(21, 34, 56, 0.08);
+  --radius:18px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(187, 90, 44, 0.14), transparent 28%),
+    linear-gradient(180deg, #f8f5ee 0%, var(--bg) 100%);
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+button:active{
+  transform:translateY(0);
+}
+
+input,
+select{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  color:var(--text);
+}
+
+input:focus,
+select:focus{
+  outline:none;
+  border-color:#d7aa90;
+  box-shadow:0 0 0 4px rgba(187, 90, 44, 0.1);
+}
+
+.hidden{
+  display:none !important;
+}
+
+.login-screen{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+
+.login-shell{
+  width:min(980px, 100%);
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  background:rgba(255,255,255,0.8);
+  border:1px solid rgba(231,223,212,0.9);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+
+.login-brand{
+  padding:48px;
+  background:
+    linear-gradient(160deg, rgba(21,34,56,0.98), rgba(34,52,83,0.96)),
+    var(--nav);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:24px;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  color:#d9e3f0;
+  font-size:13px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.login-brand h1{
+  margin:0;
+  font-size:clamp(2rem, 4vw, 3.5rem);
+  line-height:1;
+}
+
+.login-brand p{
+  margin:0;
+  color:#d9e3f0;
+  font-size:1rem;
+  line-height:1.65;
+  max-width:32rem;
+}
+
+.feature-list{
+  display:grid;
+  gap:14px;
+}
+
+.feature-item{
+  padding:16px 18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+.feature-item strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+.login-panel{
+  padding:48px;
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.login-panel h2{
+  margin:0 0 8px;
+  font-size:2rem;
+}
+
+.login-panel p{
+  margin:0 0 24px;
+  color:var(--muted);
+}
+
+.form-grid{
+  display:grid;
+  gap:14px;
+}
+
+.field{
+  display:grid;
+  gap:8px;
+}
+
+.field label{
+  font-size:.95rem;
+  font-weight:600;
+}
+
+.primary-btn{
+  width:100%;
+  padding:13px 16px;
+  background:linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color:#fff;
+  box-shadow:0 12px 24px rgba(143, 62, 26, 0.2);
+}
+
+.primary-btn.secondary{
+  background:var(--nav);
+  box-shadow:none;
+}
+
+.ghost-btn{
+  padding:10px 14px;
+  background:#fff;
+  color:var(--text);
+  border:1px solid var(--line);
+}
+
+.note{
+  margin-top:16px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#fff6ef;
+  color:#8a4e27;
+  font-size:.92rem;
+}
+
+.app-shell{
+  min-height:100vh;
+}
+
+.sidebar{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:280px;
+  padding:28px 22px;
+  background:
+    linear-gradient(180deg, rgba(21,34,56,0.98), rgba(16,28,46,0.98)),
+    var(--nav);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.brand-card{
+  padding:18px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.brand-card h3{
+  margin:0 0 8px;
+  font-size:1.4rem;
+}
+
+.brand-card p{
+  margin:0;
+  color:#c7d4e5;
+  line-height:1.5;
+  font-size:.95rem;
+}
+
+.nav-list{
+  display:grid;
+  gap:8px;
+}
+
+.nav-btn{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  background:transparent;
+  color:#dfe8f3;
+  text-align:left;
+}
+
+.nav-btn.active,
+.nav-btn:hover{
+  background:rgba(255,255,255,0.09);
+  color:#fff;
+}
+
+.sidebar-footer{
+  margin-top:auto;
+  display:grid;
+  gap:12px;
+}
+
+.mini-stats{
+  padding:16px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.mini-stats span{
+  display:block;
+  color:#c7d4e5;
+  font-size:.85rem;
+  margin-bottom:4px;
+}
+
+.mini-stats strong{
+  font-size:1.6rem;
+}
+
+.content{
+  margin-left:280px;
+  padding:34px;
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:flex-start;
+  margin-bottom:24px;
+}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:2.2rem;
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+  max-width:40rem;
+  line-height:1.6;
+}
+
+.status-chip{
+  padding:10px 14px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  white-space:nowrap;
+  color:var(--muted);
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+  animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:18px;
+  margin-bottom:24px;
+}
+
+.metric-card{
+  padding:22px;
+  border-radius:var(--radius);
+  background:var(--surface-strong);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+
+.metric-card span{
+  display:block;
+  font-size:.9rem;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+
+.metric-card strong{
+  display:block;
+  font-size:2rem;
+  margin-bottom:6px;
+}
+
+.metric-card p{
+  margin:0;
+  color:var(--muted);
+}
+
+.tone-candidate{
+  background:linear-gradient(180deg, #fff5f0, #ffffff);
+}
+
+.tone-employee{
+  background:linear-gradient(180deg, #f4fbf7, #ffffff);
+}
+
+.tone-training{
+  background:linear-gradient(180deg, #f2f8ff, #ffffff);
+}
+
+.tone-salary{
+  background:linear-gradient(180deg, #fff8eb, #ffffff);
+}
+
+.layout-two{
+  display:grid;
+  grid-template-columns:minmax(280px, 360px) minmax(0, 1fr);
+  gap:20px;
+}
+
+.panel{
+  background:var(--surface-strong);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+}
+
+.panel h2,
+.panel h3{
+  margin:0 0 8px;
+}
+
+.panel p{
+  margin:0 0 18px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+.action-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.list{
+  display:grid;
+  gap:12px;
+}
+
+.list-card{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  padding:16px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid var(--line);
+}
+
+.list-card h4{
+  margin:0 0 6px;
+  font-size:1rem;
+}
+
+.list-card p{
+  margin:0;
+  color:var(--muted);
+  font-size:.94rem;
+}
+
+.tag{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#f5ede7;
+  color:#8a4e27;
+  font-size:.82rem;
+  font-weight:600;
+}
+
+.tag.success{
+  background:#ebf7f2;
+  color:var(--success);
+}
+
+.tag.warning{
+  background:#fff6e7;
+  color:var(--warning);
+}
+
+.empty{
+  padding:24px;
+  border-radius:16px;
+  border:1px dashed #d7cabb;
+  color:var(--muted);
+  background:#fffcf8;
+  text-align:center;
+}
+
+.inline-form{
+  display:grid;
+  gap:14px;
+}
+
+.inline-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+
+.salary-value{
+  font-weight:700;
+  color:var(--accent-strong);
+}
+
+.footer-note{
+  margin-top:20px;
+  font-size:.9rem;
+  color:var(--muted);
+}
+
+@media (max-width: 1080px){
+  .metrics{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .layout-two{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 860px){
+  .login-shell{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    position:static;
+    width:auto;
+    height:auto;
+  }
+
+  .content{
+    margin-left:0;
+    padding:22px;
+  }
+
+  .hero{
+    flex-direction:column;
+  }
+}
+
+@media (max-width: 560px){
+  .login-brand,
+  .login-panel,
+  .sidebar,
+  .content{
+    padding:20px;
+  }
+
+  .metrics,
+  .inline-grid{
+    grid-template-columns:1fr;
+  }
+
+  .list-card{
+    flex-direction:column;
+    align-items:stretch;
+  }
+}
+</style>
+</head>
+<body>
+
+<section class="login-screen" id="loginScreen">
+  <div class="login-shell">
+    <div class="login-brand">
+      <div>
+        <span class="eyebrow">Gestao de pessoas</span>
+        <h1>CRM Profissional</h1>
+        <p>Centralize recrutamento, treinamento, funcionarios, departamentos, salarios e usuarios em um unico painel local.</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <strong>Fluxo completo</strong>
+          <span>Leve candidatos ate a contratacao em poucos cliques.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Controle simples</strong>
+          <span>Dados salvos no navegador para voce continuar de onde parou.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Visual mais claro</strong>
+          <span>Interface responsiva com foco em leitura e produtividade.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-panel">
+      <h2>Acesse sua conta</h2>
+      <p>Use o usuario padrao para entrar pela primeira vez.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="loginUser">Usuario</label>
+          <input id="loginUser" autocomplete="username" placeholder="Digite seu usuario">
+        </div>
+
+        <div class="field">
+          <label for="loginPass">Senha</label>
+          <input id="loginPass" type="password" autocomplete="current-password" placeholder="Digite sua senha">
+        </div>
+
+        <button class="primary-btn" id="loginButton" type="button">Entrar no CRM</button>
+      </div>
+
+      <div class="note">
+        Credencial inicial: <strong>admin</strong> / <strong>123</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="app-shell hidden" id="appShell">
+  <aside class="sidebar">
+    <div class="brand-card">
+      <h3>CRM</h3>
+      <p>Gestao operacional para RH, recrutamento e administracao interna.</p>
+    </div>
+
+    <nav class="nav-list">
+      <button class="nav-btn active" data-section="dash" type="button">Dashboard</button>
+      <button class="nav-btn" data-section="recrut" type="button">Recrutamento</button>
+      <button class="nav-btn" data-section="treino" type="button">Treinamento</button>
+      <button class="nav-btn" data-section="func" type="button">Funcionarios</button>
+      <button class="nav-btn" data-section="dept" type="button">Departamentos</button>
+      <button class="nav-btn" data-section="fin" type="button">Financeiro</button>
+      <button class="nav-btn" data-section="users" type="button">Usuarios</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="mini-stats">
+        <span>Usuario conectado</span>
+        <strong id="activeUserLabel">admin</strong>
+      </div>
+
+      <button class="primary-btn secondary" id="logoutButton" type="button">Sair</button>
+    </div>
+  </aside>
+
+  <section class="content">
+    <div class="hero">
+      <div>
+        <h1>Painel principal</h1>
+        <p>Gerencie etapas de selecao, acompanhe treinamento, mantenha usuarios organizados e monitore indicadores essenciais do time.</p>
+      </div>
+      <div class="status-chip" id="statusChip">Dados salvos localmente</div>
+    </div>
+
+    <section class="section active" id="dash">
+      <div class="metrics">
+        <div class="metric-card tone-candidate">
+          <span>Candidatos</span>
+          <strong id="metricCandidates">0</strong>
+          <p>Pessoas aguardando avaliacao.</p>
+        </div>
+        <div class="metric-card tone-employee">
+          <span>Funcionarios</span>
+          <strong id="metricEmployees">0</strong>
+          <p>Equipe contratada e ativa.</p>
+        </div>
+        <div class="metric-card tone-training">
+          <span>Treinamento</span>
+          <strong id="metricTraining">0</strong>
+          <p>Colaboradores em capacitacao.</p>
+        </div>
+        <div class="metric-card tone-salary">
+          <span>Folha cadastrada</span>
+          <strong id="metricSalaries">0</strong>
+          <p>Registros salariais no sistema.</p>
+        </div>
+      </div>
+
+      <div class="layout-two">
+        <div class="panel">
+          <h2>Resumo rapido</h2>
+          <p>Uma visao simples do momento operacional do CRM.</p>
+          <div class="list" id="dashboardSummary"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Atencao do dia</h2>
+          <p>Priorize os proximos movimentos da equipe com base nos dados atuais.</p>
+          <div class="list" id="dashboardHighlights"></div>
+          <div class="footer-note">As recomendacoes sao geradas automaticamente com base no conteudo salvo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="recrut">
+      <div class="layout-two">
+        <div class="panel">
+          <h2>Novo candidato</h2>
+          <p>Cadastre candidatos para avancar no processo seletivo.</p>
+
+          <div class="inline-form">
+            <div class="field">
+              <label for="candidateName">Nome</label>
+              <input id="candidateName" placeholder="Ex.: Maria Oliveira">
+            </div>
+            <div class="field">
+              <label for="candidateCity">Cidade</label>
+              <input id="candidateCity" placeholder="Ex.: Sao Paulo">
+            </div>
+            <div class="field">
+              <label for="candidateRole">Cargo</label>
+              <input id="candidateRole" placeholder="Ex.: Analista Financeiro">
+            </div>
+            <button class="primary-btn" id="addCandidateButton" type="button">Adicionar candidato</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Fila de recrutamento</h2>
+          <p>Candidatos aprovados seguem para treinamento.</p>
+          <div class="list" id="candidateList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="treino">
+      <div class="panel">
+        <h2>Treinamento</h2>
+        <p>Profissionais aprovados em recrutamento aguardando contratacao final.</p>
+        <div class="list" id="trainingList"></div>
+      </div>
+    </section>
+
+    <section class="section" id="func">
+      <div class="panel">
+        <h2>Funcionarios</h2>
+        <p>Lista atual de pessoas contratadas.</p>
+        <div class="list" id="employeeList"></div>
+      </div>
+    </section>
+
+    <section class="section" id="dept">
+      <div class="layout-two">
+        <div class="panel">
+          <h2>Novo departamento</h2>
+          <p>Adicione estruturas internas para organizar a empresa.</p>
+          <div class="inline-form">
+            <div class="field">
+              <label for="departmentName">Nome do departamento</label>
+              <input id="departmentName" placeholder="Ex.: Comercial">
+            </div>
+            <button class="primary-btn" id="addDepartmentButton" type="button">Criar departamento</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Departamentos cadastrados</h2>
+          <p>Base organizacional utilizada pelo time.</p>
+          <div class="list" id="departmentList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="fin">
+      <div class="layout-two">
+        <div class="panel">
+          <h2>Novo salario</h2>
+          <p>Cadastre valores para acompanhamento interno.</p>
+          <div class="inline-form">
+            <div class="field">
+              <label for="salaryName">Nome</label>
+              <input id="salaryName" placeholder="Ex.: Carlos Lima">
+            </div>
+            <div class="field">
+              <label for="salaryValue">Salario</label>
+              <input id="salaryValue" inputmode="decimal" placeholder="Ex.: 4500">
+            </div>
+            <button class="primary-btn" id="addSalaryButton" type="button">Adicionar salario</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Folha cadastrada</h2>
+          <p>Registros salariais salvos no navegador.</p>
+          <div class="list" id="salaryList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="users">
+      <div class="layout-two">
+        <div class="panel">
+          <h2>Novo usuario</h2>
+          <p>Crie acessos simples para uso interno do sistema.</p>
+          <div class="inline-form">
+            <div class="field">
+              <label for="newUserName">Usuario</label>
+              <input id="newUserName" placeholder="Ex.: financeiro">
+            </div>
+            <div class="field">
+              <label for="newUserPass">Senha</label>
+              <input id="newUserPass" type="password" placeholder="Defina uma senha">
+            </div>
+            <button class="primary-btn" id="addUserButton" type="button">Criar usuario</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Usuarios ativos</h2>
+          <p>Contas disponiveis para login local.</p>
+          <div class="list" id="userList"></div>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script>
+const storage = {
+  users: "crm_users",
+  candidates: "crm_candidates",
+  training: "crm_training",
+  employees: "crm_employees",
+  departments: "crm_departments",
+  salaries: "crm_salaries"
+};
+
+const defaultData = {
+  users: [{ u: "admin", p: "123" }],
+  candidates: [],
+  training: [],
+  employees: [],
+  departments: ["Financeiro", "RH", "Administrativo"],
+  salaries: []
+};
+
+function readStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+let users = readStorage(storage.users, defaultData.users);
+let candidates = readStorage(storage.candidates, defaultData.candidates);
+let training = readStorage(storage.training, defaultData.training);
+let employees = readStorage(storage.employees, defaultData.employees);
+let departments = readStorage(storage.departments, defaultData.departments);
+let salaries = readStorage(storage.salaries, defaultData.salaries);
+let activeUser = "admin";
+
+const formatCurrency = (value) =>
+  Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const el = {
+  loginScreen: document.getElementById("loginScreen"),
+  appShell: document.getElementById("appShell"),
+  loginUser: document.getElementById("loginUser"),
+  loginPass: document.getElementById("loginPass"),
+  loginButton: document.getElementById("loginButton"),
+  logoutButton: document.getElementById("logoutButton"),
+  navButtons: document.querySelectorAll(".nav-btn"),
+  sections: document.querySelectorAll(".section"),
+  activeUserLabel: document.getElementById("activeUserLabel"),
+  statusChip: document.getElementById("statusChip"),
+  metricCandidates: document.getElementById("metricCandidates"),
+  metricEmployees: document.getElementById("metricEmployees"),
+  metricTraining: document.getElementById("metricTraining"),
+  metricSalaries: document.getElementById("metricSalaries"),
+  dashboardSummary: document.getElementById("dashboardSummary"),
+  dashboardHighlights: document.getElementById("dashboardHighlights"),
+  candidateName: document.getElementById("candidateName"),
+  candidateCity: document.getElementById("candidateCity"),
+  candidateRole: document.getElementById("candidateRole"),
+  addCandidateButton: document.getElementById("addCandidateButton"),
+  candidateList: document.getElementById("candidateList"),
+  trainingList: document.getElementById("trainingList"),
+  employeeList: document.getElementById("employeeList"),
+  departmentName: document.getElementById("departmentName"),
+  addDepartmentButton: document.getElementById("addDepartmentButton"),
+  departmentList: document.getElementById("departmentList"),
+  salaryName: document.getElementById("salaryName"),
+  salaryValue: document.getElementById("salaryValue"),
+  addSalaryButton: document.getElementById("addSalaryButton"),
+  salaryList: document.getElementById("salaryList"),
+  newUserName: document.getElementById("newUserName"),
+  newUserPass: document.getElementById("newUserPass"),
+  addUserButton: document.getElementById("addUserButton"),
+  userList: document.getElementById("userList")
+};
+
+function saveData() {
+  localStorage.setItem(storage.users, JSON.stringify(users));
+  localStorage.setItem(storage.candidates, JSON.stringify(candidates));
+  localStorage.setItem(storage.training, JSON.stringify(training));
+  localStorage.setItem(storage.employees, JSON.stringify(employees));
+  localStorage.setItem(storage.departments, JSON.stringify(departments));
+  localStorage.setItem(storage.salaries, JSON.stringify(salaries));
+  render();
+}
+
+function setStatus(message) {
+  el.statusChip.textContent = message;
+}
+
+function clearFields(...fields) {
+  fields.forEach((field) => {
+    field.value = "";
+  });
+}
+
+function showSection(sectionId) {
+  el.sections.forEach((section) => {
+    section.classList.toggle("active", section.id === sectionId);
+  });
+
+  el.navButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.section === sectionId);
+  });
+}
+
+function login() {
+  const username = el.loginUser.value.trim();
+  const password = el.loginPass.value.trim();
+  const foundUser = users.find((item) => item.u === username && item.p === password);
+
+  if (!foundUser) {
+    alert("Login invalido. Verifique usuario e senha.");
+    return;
+  }
+
+  activeUser = foundUser.u;
+  el.activeUserLabel.textContent = activeUser;
+  el.loginScreen.classList.add("hidden");
+  el.appShell.classList.remove("hidden");
+  showSection("dash");
+  setStatus("Sessao iniciada com sucesso");
+  render();
+}
+
+function logout() {
+  activeUser = "admin";
+  el.loginPass.value = "";
+  el.appShell.classList.add("hidden");
+  el.loginScreen.classList.remove("hidden");
+  setStatus("Dados salvos localmente");
+}
+
+function addCandidate() {
+  const name = el.candidateName.value.trim();
+  const city = el.candidateCity.value.trim();
+  const role = el.candidateRole.value.trim();
+
+  if (!name || !city || !role) {
+    alert("Preencha nome, cidade e cargo do candidato.");
+    return;
+  }
+
+  candidates.push({ n: name, c: city, g: role });
+  clearFields(el.candidateName, el.candidateCity, el.candidateRole);
+  setStatus("Candidato adicionado ao recrutamento");
+  saveData();
+}
+
+function approveCandidate(index) {
+  training.push(candidates[index]);
+  candidates.splice(index, 1);
+  setStatus("Candidato movido para treinamento");
+  saveData();
+}
+
+function hireFromTraining(index) {
+  employees.push(training[index]);
+  training.splice(index, 1);
+  setStatus("Profissional contratado com sucesso");
+  saveData();
+}
+
+function addDepartment() {
+  const departmentName = el.departmentName.value.trim();
+
+  if (!departmentName) {
+    alert("Informe o nome do departamento.");
+    return;
+  }
+
+  if (departments.some((item) => item.toLowerCase() === departmentName.toLowerCase())) {
+    alert("Esse departamento ja existe.");
+    return;
+  }
+
+  departments.push(departmentName);
+  clearFields(el.departmentName);
+  setStatus("Departamento criado");
+  saveData();
+}
+
+function addSalary() {
+  const name = el.salaryName.value.trim();
+  const rawValue = el.salaryValue.value.replace(",", ".").trim();
+  const numericValue = Number(rawValue);
+
+  if (!name || !rawValue) {
+    alert("Informe nome e salario.");
+    return;
+  }
+
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    alert("Informe um valor de salario valido.");
+    return;
+  }
+
+  salaries.push({ n: name, v: numericValue });
+  clearFields(el.salaryName, el.salaryValue);
+  setStatus("Salario cadastrado");
+  saveData();
+}
+
+function addUser() {
+  const username = el.newUserName.value.trim();
+  const password = el.newUserPass.value.trim();
+
+  if (!username || !password) {
+    alert("Informe usuario e senha.");
+    return;
+  }
+
+  if (users.some((item) => item.u.toLowerCase() === username.toLowerCase())) {
+    alert("Esse usuario ja existe.");
+    return;
+  }
+
+  users.push({ u: username, p: password });
+  clearFields(el.newUserName, el.newUserPass);
+  setStatus("Usuario criado com sucesso");
+  saveData();
+}
+
+function renderList(container, items, emptyMessage, mapper) {
+  if (!items.length) {
+    container.innerHTML = '<div class="empty">' + emptyMessage + "</div>";
+    return;
+  }
+
+  container.innerHTML = items.map(mapper).join("");
+}
+
+function render() {
+  el.metricCandidates.textContent = String(candidates.length);
+  el.metricEmployees.textContent = String(employees.length);
+  el.metricTraining.textContent = String(training.length);
+  el.metricSalaries.textContent = String(salaries.length);
+  el.activeUserLabel.textContent = activeUser;
+
+  const salaryTotal = salaries.reduce((sum, item) => sum + Number(item.v), 0);
+  const summaryItems = [
+    {
+      title: "Folha total cadastrada",
+      info: salaries.length ? formatCurrency(salaryTotal) : "Nenhum salario registrado"
+    },
+    {
+      title: "Departamentos ativos",
+      info: departments.length + " area(s) estruturada(s)"
+    },
+    {
+      title: "Pipeline de selecao",
+      info: (candidates.length + training.length) + " pessoa(s) em andamento"
+    }
+  ];
+
+  renderList(
+    el.dashboardSummary,
+    summaryItems,
+    "Nenhum resumo disponivel.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.title}</h4>
+          <p>${item.info}</p>
+        </div>
+        <span class="tag">Resumo</span>
+      </div>
+    `
+  );
+
+  const highlights = [];
+
+  if (candidates.length) {
+    highlights.push({
+      title: "Revisar recrutamento",
+      info: `${candidates.length} candidato(s) aguardando aprovacao.`,
+      tone: "warning"
+    });
+  }
+
+  if (training.length) {
+    highlights.push({
+      title: "Concluir contratacoes",
+      info: `${training.length} pessoa(s) prontas para a etapa final.`,
+      tone: "success"
+    });
+  }
+
+  if (!highlights.length) {
+    highlights.push({
+      title: "Fluxo organizado",
+      info: "No momento nao ha pendencias operacionais urgentes.",
+      tone: ""
+    });
+  }
+
+  renderList(
+    el.dashboardHighlights,
+    highlights,
+    "Nenhuma recomendacao disponivel.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.title}</h4>
+          <p>${item.info}</p>
+        </div>
+        <span class="tag ${item.tone}">${item.tone === "success" ? "Acao" : item.tone === "warning" ? "Prioridade" : "OK"}</span>
+      </div>
+    `
+  );
+
+  renderList(
+    el.candidateList,
+    candidates,
+    "Nenhum candidato cadastrado ainda.",
+    (item, index) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.n}</h4>
+          <p>${item.g} • ${item.c}</p>
+        </div>
+        <div class="action-row">
+          <span class="tag warning">Analise</span>
+          <button class="ghost-btn" type="button" onclick="approveCandidate(${index})">Aprovar</button>
+        </div>
+      </div>
+    `
+  );
+
+  renderList(
+    el.trainingList,
+    training,
+    "Nenhum profissional em treinamento.",
+    (item, index) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.n}</h4>
+          <p>${item.g} • ${item.c}</p>
+        </div>
+        <div class="action-row">
+          <span class="tag">Treinamento</span>
+          <button class="ghost-btn" type="button" onclick="hireFromTraining(${index})">Contratar</button>
+        </div>
+      </div>
+    `
+  );
+
+  renderList(
+    el.employeeList,
+    employees,
+    "Nenhum funcionario contratado ainda.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.n}</h4>
+          <p>${item.g} • ${item.c}</p>
+        </div>
+        <span class="tag success">Ativo</span>
+      </div>
+    `
+  );
+
+  renderList(
+    el.departmentList,
+    departments,
+    "Nenhum departamento criado ainda.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item}</h4>
+          <p>Departamento disponivel para organizacao interna.</p>
+        </div>
+        <span class="tag">Estrutura</span>
+      </div>
+    `
+  );
+
+  renderList(
+    el.salaryList,
+    salaries,
+    "Nenhum salario cadastrado ainda.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.n}</h4>
+          <p class="salary-value">${formatCurrency(item.v)}</p>
+        </div>
+        <span class="tag success">Registrado</span>
+      </div>
+    `
+  );
+
+  renderList(
+    el.userList,
+    users,
+    "Nenhum usuario cadastrado ainda.",
+    (item) => `
+      <div class="list-card">
+        <div>
+          <h4>${item.u}</h4>
+          <p>Acesso local habilitado para login.</p>
+        </div>
+        <span class="tag">Usuario</span>
+      </div>
+    `
+  );
+}
+
+el.loginButton.addEventListener("click", login);
+el.logoutButton.addEventListener("click", logout);
+el.addCandidateButton.addEventListener("click", addCandidate);
+el.addDepartmentButton.addEventListener("click", addDepartment);
+el.addSalaryButton.addEventListener("click", addSalary);
+el.addUserButton.addEventListener("click", addUser);
+
+el.navButtons.forEach((button) => {
+  button.addEventListener("click", () => showSection(button.dataset.section));
+});
+
+el.loginPass.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    login();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
